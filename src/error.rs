@@ -1,5 +1,8 @@
+use std::{error::Error, fmt::Display};
+
 use axum::{http::StatusCode, response::IntoResponse};
 
+#[derive(Debug)]
 pub(crate) enum AppError {
     InternalServerError(eyre::Error),
     NotFound(eyre::Error),
@@ -16,3 +19,16 @@ impl IntoResponse for AppError {
         .into_response()
     }
 }
+
+impl Display for AppError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let error = match self {
+            AppError::InternalServerError(e) => e,
+            AppError::NotFound(e) => e,
+            AppError::BadRequest(e) => e,
+        };
+        write!(f, "{error}")
+    }
+}
+
+impl Error for AppError {}
